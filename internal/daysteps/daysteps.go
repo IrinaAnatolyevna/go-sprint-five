@@ -1,7 +1,6 @@
 package daysteps
 
 import (
-	//"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -20,32 +19,32 @@ type DaySteps struct {
 func (ds *DaySteps) Parse(datastring string) (err error) {
     parts := strings.Split(datastring, ",")
     if len(parts) != 2 {
-        return fmt.Errorf("ожидалось 2 параметра, получено %d", len(parts))
+        return fmt.Errorf("expected 2 parameters, got %d", len(parts))
     }
 
     stepStr := parts[0]
     durStr := parts[1]
 
-    // Проверка пробелов в начале/конце
-    if stepStr != strings.TrimSpace(stepStr) {
-        return fmt.Errorf("шаги не должны содержать пробелов в начале или конце")
-    }
-    if durStr != strings.TrimSpace(durStr) {
-        return fmt.Errorf("продолжительность не должна содержать пробелов в начале или конце")
-    }
-
     // Парсим шаги
     steps, err := strconv.Atoi(stepStr)
-    if err != nil || steps <= 0 {
-        return fmt.Errorf("некорректное количество шагов: %s", stepStr)
+    if err != nil {
+      return fmt.Errorf("failed to parse steps: %w", err)
+    }
+    if steps <= 0 {
+      return fmt.Errorf("steps must be greater than zero")
     }
     ds.Steps = steps
 
+
     // Парсим длительность
     duration, err := time.ParseDuration(durStr)
-    if err != nil || duration <= 0 {
-        return fmt.Errorf("некорректная продолжительность: %s", durStr)
+    if err != nil {
+      return fmt.Errorf("failed to parse duration: %w", err)
     }
+    if duration <= 0 {
+      return fmt.Errorf("duration must be greater than zero")
+    }
+
     ds.Duration = duration
 
     return nil

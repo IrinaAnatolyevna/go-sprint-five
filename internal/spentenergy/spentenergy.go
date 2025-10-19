@@ -14,8 +14,17 @@ const (
 )
 
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-    if steps <= 0 || weight <= 0 || height <= 0 || duration <= 0 {
-	return 0, errors.New("invalid input parameters")
+   if steps <= 0 {
+        return 0, errors.New("steps must be greater than zero")
+    }
+    if weight <= 0 {
+        return 0, errors.New("weight must be greater than zero")
+    }
+    if height <= 0 {
+        return 0, errors.New("height must be greater than zero")
+    }
+    if duration <= 0 {
+        return 0, errors.New("duration must be greater than zero")
     }
 
     speed := MeanSpeed(steps, height, duration)

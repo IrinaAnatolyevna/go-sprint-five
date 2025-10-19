@@ -7,11 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"github.com/Yandex-Practicum/tracker/internal/personaldata"
 	"github.com/Yandex-Practicum/tracker/internal/spentenergy"
-
-
 )
 
 
@@ -22,44 +19,35 @@ type Training struct {
     personaldata.Personal
 }
 
-func (t *Training) Parse(datastring string) error {
+func (t *Training) Parse(datastring string) (err error) {
     parts := strings.Split(datastring, ",")
     if len(parts) != 3 {
-        return errors.New("некорректный формат данных: ожидалось 3 элемента")
+        return errors.New("invalid data format: expected 3 elements")
     }
-
+    stepStr := parts[0]
+    if strings.ContainsAny(stepStr, " \t") {
+        return fmt.Errorf("steps contain spaces")
+    }
     // шаги
-    steps, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+    steps, err := strconv.Atoi(stepStr)
     if err != nil {
-        return fmt.Errorf("ошибка парсинга количества шагов: %w", err)
+        return fmt.Errorf("failed to parse steps: %w", err)
     }
     if steps <= 0 {
-        return errors.New("шаги должны быть положительными")
+        return errors.New("steps must be positive")
     }
     t.Steps = steps
 
     // тип тренировки
-    rawType := strings.TrimSpace(parts[1])
-    normalizedType := strings.ToLower(rawType)
-
-    switch normalizedType {
-    case "бег":
-        t.TrainingType = "Бег"
-    case "ходьба":
-        t.TrainingType = "Ходьба"
-    case "плавание":
-        t.TrainingType = "Плавание"
-    default:
-        return fmt.Errorf("неизвестный тип тренировки: %s", rawType)
-    }
+    t.TrainingType = strings.TrimSpace(parts[1])
 
     // длительность
     duration, err := time.ParseDuration(strings.TrimSpace(parts[2]))
     if err != nil {
-        return fmt.Errorf("ошибка парсинга длительности: %w", err)
+        return fmt.Errorf("failed to parse duration: %w", err)
     }
     if duration <= 0 {
-        return errors.New("длительность должна быть положительной")
+        return errors.New("duration must be positive")
     }
     t.Duration = duration
 
